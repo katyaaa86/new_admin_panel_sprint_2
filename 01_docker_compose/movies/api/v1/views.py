@@ -17,12 +17,15 @@ class MoviesApiMixin:
             .values('id', 'title', 'description', 'creation_date', 'rating', 'type') \
             .annotate(
             genres=ArrayAgg('genres__name', distinct=True),
-            actors=ArraySubquery(
-                PersonFilmwork.objects.filter(film_work_id=OuterRef('id'), role='actor').values('person__full_name')),
-            directors=ArraySubquery(PersonFilmwork.objects.filter(film_work_id=OuterRef('id'), role='director').values(
-                'person__full_name')),
-            writers=ArraySubquery(
-                PersonFilmwork.objects.filter(film_work_id=OuterRef('id'), role='writer').values('person__full_name')),
+            actors=ArraySubquery(PersonFilmwork.objects.filter(
+                film_work_id=OuterRef('id'), role=PersonFilmwork.Role.ACTOR,
+            ).values('person__full_name')),
+            directors=ArraySubquery(PersonFilmwork.objects.filter(
+                film_work_id=OuterRef('id'), role=PersonFilmwork.Role.DIRECTOR,
+            ).values('person__full_name')),
+            writers=ArraySubquery(PersonFilmwork.objects.filter(
+                film_work_id=OuterRef('id'), role=PersonFilmwork.Role.WRITER,
+            ).values('person__full_name')),
         )
         return queryset
 
